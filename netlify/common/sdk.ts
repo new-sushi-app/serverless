@@ -17,6 +17,16 @@ export type Scalars = {
   uuid: any;
 };
 
+export type AdminLoginInput = {
+  password: Scalars['String'];
+  username: Scalars['String'];
+};
+
+export type AdminLoginOutput = {
+  __typename?: 'AdminLoginOutput';
+  accessToken: Scalars['String'];
+};
+
 export type AdminRegisterInput = {
   password: Scalars['String'];
   username: Scalars['String'];
@@ -636,6 +646,8 @@ export enum Order_By {
 
 export type Query_Root = {
   __typename?: 'query_root';
+  /** Login admin */
+  actionLogin?: Maybe<AdminLoginOutput>;
   /** fetch data from the table: "admin" */
   admin: Array<Admin>;
   /** fetch aggregated fields from the table: "admin" */
@@ -648,6 +660,11 @@ export type Query_Root = {
   menu_aggregate: Menu_Aggregate;
   /** fetch data from the table: "menu" using primary key columns */
   menu_by_pk?: Maybe<Menu>;
+};
+
+
+export type Query_RootActionLoginArgs = {
+  arg1: AdminLoginInput;
 };
 
 
@@ -789,6 +806,13 @@ export type Uuid_Comparison_Exp = {
   _nin?: InputMaybe<Array<Scalars['uuid']>>;
 };
 
+export type GetAdminByUsernameQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type GetAdminByUsernameQuery = { __typename?: 'query_root', admin: Array<{ __typename?: 'admin', password: string, id: any }> };
+
 export type InsertAdminMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -798,6 +822,14 @@ export type InsertAdminMutationVariables = Exact<{
 export type InsertAdminMutation = { __typename?: 'mutation_root', insert_admin_one?: { __typename?: 'admin', id: any } | null };
 
 
+export const GetAdminByUsernameDocument = gql`
+    query GetAdminByUsername($username: String!) {
+  admin(where: {username: {_eq: $username}}) {
+    password
+    id
+  }
+}
+    `;
 export const InsertAdminDocument = gql`
     mutation InsertAdmin($username: String!, $password: String!) {
   insert_admin_one(object: {username: $username, password: $password}) {
@@ -813,6 +845,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    GetAdminByUsername(variables: GetAdminByUsernameQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAdminByUsernameQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAdminByUsernameQuery>(GetAdminByUsernameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'GetAdminByUsername', 'query');
+    },
     InsertAdmin(variables: InsertAdminMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<InsertAdminMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<InsertAdminMutation>(InsertAdminDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'InsertAdmin', 'mutation');
     }
